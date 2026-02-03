@@ -1,0 +1,42 @@
+function shouldWater(tempC, airRH, soilMoist, lightLevel):
+  # Inputs assumed normalized / meaningful:
+  # tempC in °C, airRH in %, soilMoist in 0..100% (higher = wetter),
+  # lightLevel in 0..100 (higher = brighter) OR lux-scaled (just consistent)
+
+  # --- Base thresholds ---
+  SOIL_DRY = 30          # below this -> usually water
+  SOIL_VERY_DRY = 20     # below this -> water even if "night"
+  LIGHT_NIGHT = 15       # below this -> treat as night (tune to your scale)
+
+  # --- Compute simple "demand score" from climate ---
+  # Higher temp => more demand
+  # Lower humidity => more demand
+  # Higher light => more demand
+  demand = 0
+
+  if tempC > 28: demand += 1
+  if tempC > 32: demand += 1
+
+  if airRH < 45: demand += 1
+  if airRH < 35: demand += 1
+
+  if lightLevel > 60: demand += 1
+  if lightLevel > 80: demand += 1
+
+  # Shift the soil threshold slightly based on demand (0..~6 points)
+  soilThreshold = SOIL_DRY + 2 * demand
+
+  # --- Decision logic ---
+  # 1) Always water if very dry
+  if soilMoist < SOIL_VERY_DRY:
+    return (true, "soil very dry")
+
+  # 2) If it's night, be conservative
+  if (lightLevel < LIGHT_NIGHT) AND (soilMoist < SOIL_DRY):
+    return (true, "night but soil dry")
+
+  # 3) Daytime decision
+  if soilMoist < soilThreshold:
+    return (true, "soil below threshold (demand-adjusted)")
+  else:
+    return (false, "soil ok")
