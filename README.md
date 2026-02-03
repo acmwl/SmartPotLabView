@@ -15,7 +15,6 @@ Smart pot irrigation system combines Arduino sensor acquisition with LabVIEW sup
 - HX711 + 5kg load cell
 - Relay module + submersible pump
 
-![[gallery/test_setup.jpg]]
 ![test_setup](https://github.com/acmwl/SmartPotLabView/blob/main/gallery/hwConnection.png)
 
 ## Quick Start
